@@ -6,6 +6,7 @@
     android:orientation="vertical"
     tools:context="org.tensorflow.codelabs.objectdetection.MainActivity">
 
+<!--    frame layout untuk menampilkan output-->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -29,6 +30,7 @@
             android:scaleType="fitCenter" />
     </FrameLayout>
 
+<!--    teks pilih gambar preset...-->
     <TextView
         android:id="@+id/tvDescription"
         android:layout_width="match_parent"
@@ -39,6 +41,7 @@
         android:textAlignment="center"
         android:text="@string/tv_description" />
 
+<!--    Gambar preset-->
     <LinearLayout
         android:id="@+id/llSampleImage"
         android:layout_width="match_parent"
@@ -77,6 +80,7 @@
             android:src="@drawable/sample_image_three" />
     </LinearLayout>
 
+<!--    tombol ambil gambar-->
     <Button
         android:id="@+id/captureImageFab"
         android:layout_width="wrap_content"

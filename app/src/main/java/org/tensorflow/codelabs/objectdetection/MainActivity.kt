@@ -117,34 +117,34 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
      *      TFLite Object Detection function
      */
     private fun runObjectDetection(bitmap: Bitmap) {
-        //TODO: Add object detection code here
-        // Step 1: create TFLite's TensorImage object
+
+        // Step 1: membuat objek TensorImage TFLite
         val image = TensorImage.fromBitmap(bitmap)
 
-        // Step 2: Initialize the detector object
+        // Step 2: Inisialisasi objek detektor
         val options = ObjectDetector.ObjectDetectorOptions.builder()
             .setMaxResults(5)
             .setScoreThreshold(0.01f)
             .build()
         val detector = ObjectDetector.createFromFileAndOptions(
-            this, // the application context
-            "android.tflite", // must be same as the filename in assets folder
+            this, // konteks aplikasi
+            "android.tflite", // harus sama dengan nama file di folder aset
             options
         )
 
-        // Step 3: feed given image to the model and print the detection result
+        // Step 3: memberi feed gambar yang diberikan ke model dan mencetak hasil deteksi
         val results = detector.detect(image)
 
-        // Step 4: Parse the detection result and show it
+        // Step 4: Parsing hasil deteksi dan menampilkannya
         val resultToDisplay = results.map {
-            // Get the top-1 category and craft the display text
+            // Mendapatkan kategori 1 teratas dan buat teks tampilan
             val category = it.categories.first()
             val text = "${category.label}, ${category.score.times(100).toInt()}%"
 
-            // Create a data object to display the detection result
+            // Membuat objek data untuk menampilkan hasil deteksi
             DetectionResult(it.boundingBox, text)
         }
-        // Draw the detection result on the bitmap and show it.
+        // Menggambarkan hasil deteksi pada bitmap dan menampilkannya.
         val imgWithResult = drawDetectionResult(bitmap, resultToDisplay)
         runOnUiThread {
             inputImageView.setImageBitmap(imgWithResult)
@@ -171,13 +171,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
      *      Set image to view and call object detection
      */
     private fun setViewAndDetect(bitmap: Bitmap) {
-        // Display capture image
+        // menampilkan gambar tangkapan
         inputImageView.setImageBitmap(bitmap)
         tvPlaceholder.visibility = View.INVISIBLE
 
-        // Run ODT and display result
-        // Note that we run this in the background thread to avoid blocking the app UI because
-        // TFLite object detection is a synchronised process.
+        // Jalankan ODT dan tampilkan hasilnya
+        // Perhatikan bahwa menjalankan ini di utas latar belakang untuk menghindari pemblokiran UI aplikasi karena
+        // Deteksi objek TFLite adalah proses yang disinkronkan.
         lifecycleScope.launch(Dispatchers.Default) { runObjectDetection(bitmap) }
     }
 
@@ -186,12 +186,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
      *      Decodes and crops the captured image from camera.
      */
     private fun getCapturedImage(): Bitmap {
-        // Get the dimensions of the View
+        // Dapatkan dimensi Tampilan
         val targetW: Int = inputImageView.width
         val targetH: Int = inputImageView.height
 
         val bmOptions = BitmapFactory.Options().apply {
-            // Get the dimensions of the bitmap
+            // Dapatkan dimensi bitmap
             inJustDecodeBounds = true
 
             BitmapFactory.decodeFile(currentPhotoPath, this)
@@ -199,10 +199,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             val photoW: Int = outWidth
             val photoH: Int = outHeight
 
-            // Determine how much to scale down the image
+            // Menentukan berapa banyak untuk memperkecil gambar
             val scaleFactor: Int = max(1, min(photoW / targetW, photoH / targetH))
 
-            // Decode the image file into a Bitmap sized to fill the View
+            // Decode file gambar menjadi ukuran Bitmap untuk mengisi View
             inJustDecodeBounds = false
             inSampleSize = scaleFactor
             inMutable = true
@@ -259,7 +259,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
      */
     @Throws(IOException::class)
     private fun createImageFile(): File {
-        // Create an image file name
+        // Buat nama file gambar
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
@@ -267,7 +267,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             ".jpg", /* suffix */
             storageDir /* directory */
         ).apply {
-            // Save a file: path for use with ACTION_VIEW intents
+            // Simpan file: jalur untuk digunakan dengan maksud ACTION_VIEW
             currentPhotoPath = absolutePath
         }
     }
@@ -278,16 +278,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
      */
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            // Ensure that there's a camera activity to handle the intent
+            // Pastikan ada aktivitas kamera untuk menangani maksud
             takePictureIntent.resolveActivity(packageManager)?.also {
-                // Create the File where the photo should go
+                // Buat File di mana foto harus pergi
                 val photoFile: File? = try {
                     createImageFile()
                 } catch (e: IOException) {
                     Log.e(TAG, e.message.toString())
                     null
                 }
-                // Continue only if the File was successfully created
+                // Lanjutkan hanya jika File berhasil dibuat
                 photoFile?.also {
                     val photoURI: Uri = FileProvider.getUriForFile(
                         this,
@@ -315,7 +315,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         pen.textAlign = Paint.Align.LEFT
 
         detectionResults.forEach {
-            // draw bounding box
+            // menggambar kotak pembatas
             pen.color = Color.RED
             pen.strokeWidth = 8F
             pen.style = Paint.Style.STROKE
@@ -325,7 +325,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
             val tagSize = Rect(0, 0, 0, 0)
 
-            // calculate the right font size
+            // menghitung ukuran font yang tepat
             pen.style = Paint.Style.FILL_AND_STROKE
             pen.color = Color.YELLOW
             pen.strokeWidth = 2F
@@ -334,7 +334,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             pen.getTextBounds(it.text, 0, it.text.length, tagSize)
             val fontSize: Float = pen.textSize * box.width() / tagSize.width()
 
-            // adjust the font size so texts are inside the bounding box
+            // sesuaikan ukuran font sehingga teks berada di dalam kotak pembatas
             if (fontSize < pen.textSize) pen.textSize = fontSize
 
             var margin = (box.width() - tagSize.width()) / 2.0F
